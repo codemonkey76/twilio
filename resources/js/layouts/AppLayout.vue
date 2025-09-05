@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/app/AppSidebarLayout.vue';
 import type { BreadcrumbItemType } from '@/types';
+import { onMounted } from 'vue';
 
 interface Props {
     breadcrumbs?: BreadcrumbItemType[];
@@ -8,6 +9,10 @@ interface Props {
 
 withDefaults(defineProps<Props>(), {
     breadcrumbs: () => [],
+});
+
+onMounted(() => {
+    console.log('AppLayout mounted');
 });
 </script>
 
