@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useCallStore } from '@/stores/call';
+import api from '@/utils/api';
 import { storeToRefs } from 'pinia';
 import { computed, onMounted, ref } from 'vue';
 
@@ -151,27 +152,10 @@ const makeCall = async () => {
 const fetchUserDids = async () => {
     try {
         loadingDids.value = true;
-        const response = await fetch('/api/user/dids', {
-            headers: {
-                Accept: 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-            },
-            credentials: 'same-origin',
-        });
+        const response = await api.get('dids.index');
+        dids.value = response.dids;
 
-        if (response.ok) {
-            const data = await response.json();
-            dids.value = data.dids;
-
-            // Set preferred DID or fallback to first available
-            if (data.preferred_did_id && dids.value.some((did) => did.id === data.preferred_did_id)) {
-                selectedDidId.value = data.preferred_did_id;
-            } else if (dids.value.length > 0) {
-                selectedDidId.value = dids.value[0].id;
-            }
-        } else {
-            console.error('Failed to fetch user DIDs');
-        }
+        selectedDidId.value = dids.value[0].id;
     } catch (err) {
         console.error('Error fetching user DIDs:', err);
     } finally {
@@ -179,27 +163,8 @@ const fetchUserDids = async () => {
     }
 };
 
-const updatePreferredDid = async (didId: number) => {
-    try {
-        await fetch('/api/user/dids/preferred', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Accept: 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-            },
-            credentials: 'same-origin',
-            body: JSON.stringify({ did_id: didId }),
-        });
-    } catch (err) {
-        console.error('Error updating preferred DID:', err);
-    }
-};
-
 const onDidChange = (didId: number) => {
     selectedDidId.value = didId;
-    updatePreferredDid(didId);
 };
 
 onMounted(() => {

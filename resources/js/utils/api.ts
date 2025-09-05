@@ -1,5 +1,5 @@
 import { route } from 'ziggy-js';
-
+window.route = route;
 class ApiClient {
     private getCSRFToken(): string {
         return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
@@ -14,7 +14,9 @@ class ApiClient {
     }
 
     async get(routeName: string, params?: any, options: RequestInit = {}) {
+        console.log('get', routeName, params);
         const url = route(routeName, params);
+        console.log('generated url: ', url);
         return this.request(url, {
             ...options,
             method: 'GET',

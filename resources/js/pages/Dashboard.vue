@@ -5,7 +5,6 @@ import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import CallStateComponent from '../components/CallStateComponent.vue';
 import ManualDialler from '../components/ManualDialler.vue';
-import PlaceholderPattern from '../components/PlaceholderPattern.vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -20,9 +19,10 @@ const breadcrumbs: BreadcrumbItem[] = [
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-            <PlaceholderPattern />
             <CallStateComponent />
-            <ManualDialler />
+            <div class="flex">
+                <ManualDialler class="w-sm" />
+            </div>
         </div>
     </AppLayout>
 </template>

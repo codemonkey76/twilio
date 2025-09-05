@@ -58,7 +58,6 @@ export const useCallStore = defineStore('call', () => {
             }
         } catch (error) {
             console.error('Failed to refresh Twilio token:', error);
-            toastStore.error('Failed to refresh connection token');
         } finally {
             isRefreshingToken.value = false;
         }
@@ -138,7 +137,7 @@ export const useCallStore = defineStore('call', () => {
                 },
             );
         } catch (err) {
-            toastStore.error('Failed: ' + err);
+            console.error('Failed to initiate outbound call:', err);
         }
     };
 
@@ -170,7 +169,7 @@ export const useCallStore = defineStore('call', () => {
         console.log('📞 Setting 30s ring timer');
         currentCall.value.timeoutId = window.setTimeout(() => {
             if (currentCall.value?.status === 'ringing' || currentCall.value?.status === 'ringing-connected') {
-                toastStore.error('Call timed out', 4000);
+                console.error('Call timed out');
                 hangup();
             }
         }, 30000);
