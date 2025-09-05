@@ -1,6 +1,6 @@
 import { useRingtone } from '@/composables/useRingtone';
 import { useTwilio } from '@/composables/useTwilio';
-import { OutboundCallInitiatedEvent } from '@/types/events';
+import { OutboundCallEvent } from '@/types/events';
 import api from '@/utils/api';
 import { Call } from '@twilio/voice-sdk';
 import { defineStore } from 'pinia';
@@ -175,7 +175,7 @@ export const useCallStore = defineStore('call', () => {
         }, 30000);
     };
 
-    const handleOutboundCallInitiated = async (event: OutboundCallInitiatedEvent) => {
+    const handleOutboundCallInitiated = async (event: OutboundCallEvent) => {
         const { conference } = event;
 
         const call = createCallState({
