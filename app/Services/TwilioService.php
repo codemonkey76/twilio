@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Enums\ConferenceDirection;
+use App\Models\Conference;
 use App\Models\User;
 use Twilio\Jwt\AccessToken;
 use Twilio\Jwt\Grants\VoiceGrant;
@@ -77,5 +79,52 @@ class TwilioService
             'identity' => $identity,
             'expiry' => $expiry,
         ];
+    }
+
+    public function dialSecondLeg(Conference $conference)
+    {
+        if ($conference->direction === ConferenceDirection::Inbound) {
+            $this->dialAgent($conference);
+
+            return;
+        }
+
+        $this->dialCustomer($conference);
+    }
+
+    private function dialAgent(Conference $conference)
+    {
+        $this->client->calls->create($conference->user->identity, $conference->from, [
+            'url' => $this->route('api.twilio.conference.join', [
+                'to' => $conference->to,
+                'conference_name' => $conference->name,
+            ]),
+            'method' => 'POST',
+
+            'region' => $this->region,
+        ]);
+
+    }
+
+    private function dialCustomer(Conference $conference)
+    {
+        $this->client->calls->create($conference->to, $conference->from, [
+            'url' => $this->route('api.twilio.conference.join', [
+                'to' => $conference->to,
+                'conference_name' => $conference->name,
+            ]),
+            'method' => 'POST',
+
+            'region' => $this->region,
+        ]);
+    }
+
+    private function route(string $routeName, array $params = [])
+    {
+        $baseUrl = rtrim(config('twilio.webhook_url'), '/');
+
+        $path = ltrim(route($routeName, $params, false), '/');
+
+        return "{$baseUrl}/{$path}";
     }
 }

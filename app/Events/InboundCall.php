@@ -9,7 +9,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class InitiateOutboundCall implements ShouldBroadcast
+class InboundCall implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -24,6 +24,6 @@ class InitiateOutboundCall implements ShouldBroadcast
 
     public function broadcastAs(): string
     {
-        return 'outbound.call';
+        return 'inbound.call';
     }
 }

@@ -1,6 +1,6 @@
 import { useRingtone } from '@/composables/useRingtone';
 import { useTwilio } from '@/composables/useTwilio';
-import { OutboundCallEvent } from '@/types/events';
+import { InboundCallEvent, OutboundCallEvent } from '@/types/events';
 import api from '@/utils/api';
 import { Call } from '@twilio/voice-sdk';
 import { defineStore } from 'pinia';
@@ -194,6 +194,21 @@ export const useCallStore = defineStore('call', () => {
         });
     };
 
+    const handleInboundCall = async (event: InboundCallEvent) => {
+        const { conference } = event;
+
+        const call = createCallState({
+            direction: 'inbound',
+            from: conference.from,
+            to: conference.to,
+            conference: conference.name,
+            status: 'ringing',
+        });
+
+        currentCall.value = call;
+        playInbound();
+    };
+
     const startOutboundCall = async (params: { to?: string; conferenceName?: string }) => {
         const callParams: Record<string, string> = {};
         if (!currentCall.value) return;
@@ -242,14 +257,14 @@ export const useCallStore = defineStore('call', () => {
 
             currentCall.value = null;
 
-            setTimeout(() => {
-                if (device.value && device.value.isBusy) {
-                    device.value.destroy();
-                    device.value = null;
+            // This is a hack to fix a bug where the device never returns to a usable state
+            // after a call is disconnected. It stays in a "busy" state and can't be used again.
+            if (device.value && device.value.isBusy) {
+                device.value.destroy();
+                device.value = null;
 
-                    reset();
-                }
-            }, 500);
+                reset();
+            }
         });
         call.on('error', (err) => {
             console.error('TwilioEvent: (error):', err);
@@ -264,6 +279,7 @@ export const useCallStore = defineStore('call', () => {
         // Actions
         init,
         requestCall,
+        handleInboundCall,
         handleOutboundCallInitiated,
         hangup,
         // answerCall,

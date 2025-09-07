@@ -3,7 +3,7 @@ import { appConfig } from '@/config/app';
 import AppLayout from '@/layouts/app/AppSidebarLayout.vue';
 import { useCallStore } from '@/stores/call';
 import type { BreadcrumbItemType } from '@/types';
-import { OutboundCallEvent } from '@/types/events';
+import { InboundCallEvent, OutboundCallEvent } from '@/types/events';
 import { usePage } from '@inertiajs/vue3';
 import { useEcho } from '@laravel/echo-vue';
 import { onMounted } from 'vue';
@@ -21,6 +21,11 @@ withDefaults(defineProps<Props>(), {
 useEcho(`calls.${user.id}`, '.outbound.call', (e: OutboundCallEvent) => {
     callStore.handleOutboundCallInitiated(e);
     console.log('Outbound call event received', e.conference);
+});
+
+useEcho(`calls.${user.id}`, '.inbound.call', (e: InboundCallEvent) => {
+    callStore.handleInboundCall(e);
+    console.log('Inbound call event received', e.conference);
 });
 
 onMounted(async () => {

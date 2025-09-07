@@ -62,7 +62,7 @@ export const useTwilio = (handlers: TwilioDeviceHandlers) => {
         accessToken.value = token;
         device.value = markRaw(
             new Device(token, {
-                logLevel: 'silent',
+                logLevel: 'debug',
                 disableAudioContextSounds: true,
             }),
         );
